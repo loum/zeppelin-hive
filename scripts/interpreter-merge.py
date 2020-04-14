@@ -9,7 +9,6 @@ import logging
 import pathlib
 import argparse
 
-
 LOG = logging.getLogger('interpreter_merge')
 if not LOG.handlers:
     LOG.propagate = 0
@@ -29,7 +28,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument('-p', '--path',
-                        help='Path to interpreter.json (relative to user home directory)',
+                        help='Path to interpreter.json (absolute, or relative to user home directory)',
                         default='conf')
 
     args = parser.parse_args()
@@ -41,7 +40,10 @@ def _merge(interpreter_path='conf'):
     """Merge Zeppelin interpreter JSON files.
 
     """
-    qualified_interpreter_path = os.path.join(str(pathlib.Path.home()), interpreter_path)
+    qualified_interpreter_path = interpreter_path
+    if not os.path.isabs(qualified_interpreter_path):
+        qualified_interpreter_path = os.path.join(str(pathlib.Path.home()), interpreter_path)
+
     interpreter = json.loads('{"interpreterSettings": {}}')
     if os.path.exists(os.path.join(qualified_interpreter_path, 'interpreter.json')):
         with open(os.path.join(qualified_interpreter_path, 'interpreter.json')) as _fp:
@@ -54,7 +56,7 @@ def _merge(interpreter_path='conf'):
                      interpreter_bak_file_path)
             _fp_out.write(json.dumps(interpreter, indent=2))
 
-    for interpreter_file in get_directory_files(qualified_interpreter_path, 'interpreter-.*\.json'):
+    for interpreter_file in get_directory_files(qualified_interpreter_path, '^interpreter-.*\.json$'):
         with open(interpreter_file) as _fp:
             LOG.info('Found extra interpreter file "%s"', interpreter_file)
             interpreter_extra = json.load(_fp)

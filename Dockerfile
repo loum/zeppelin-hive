@@ -26,15 +26,16 @@ RUN mkdir -pv "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" &&\
 
 RUN ls -altr "${ZEPPELIN_HIVE_INTERPRETER_JDBC}"
 
-COPY files/interpreters/jdbc/hive/interpreter-hive.json /tmp/zeppelin-${ZEPPELIN_VERSION}-bin-netinst/conf/interpreter-hive.json
+COPY files/interpreters/jdbc/hive/interpreter-*.json.j2 /tmp/zeppelin-${ZEPPELIN_VERSION}-bin-netinst/conf/
 
 ### downloader layer end
 
 FROM ubuntu:bionic-20200311
 
 RUN apt-get update && apt-get install -y --no-install-recommends\
- openjdk-8-jdk-headless=8u242-b08-0ubuntu3~18.04 \
- python3.8=3.8.0-3~18.04 &&\
+ openjdk-8-jdk-headless=8u242-b08-0ubuntu3~18.04\
+ python3.8=3.8.0-3~18.04\
+ python3-pip=9.0.1-2.3~ubuntu1.18.04.1 &&\
  apt-get clean &&\
  rm -rf /var/lib/apt/lists/* &&\
  update-alternatives --install /usr/bin/python python3 /usr/bin/python3.8 1
@@ -66,7 +67,10 @@ COPY --from=downloader --chown="${ZEPPELIN_USER}":"${ZEPPELIN_GROUP}"\
  "${ZEPPELIN_HIVE_INTERPRETER_JDBC}/*" zeppelin-${ZEPPELIN_VERSION}-bin-netinst/interpreter/jdbc/
 
 # Merge the Hive Interpreter definition into conf/interpreter.json
-COPY --chown="${ZEPPELIN_USER}":"${ZEPPELIN_GROUP}"\
- scripts/interpreter-merge.py zeppelin/interpreter-merge.py
+COPY --chown="${ZEPPELIN_USER}":"${ZEPPELIN_GROUP}" scripts/interpreter-*.py zeppelin/
+
+# Need Jinja2 for Interpreter JIT dynamic settings during container create.
+RUN python -V
+RUN python -m pip install --user jinja2
 
 CMD [ "/zeppelin-bootstrap.sh" ]
