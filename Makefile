@@ -2,7 +2,7 @@
 MAKESTER__REPO_NAME := loum
 MAKESTER__CONTAINER_NAME := zeppelin-hive
 
-include makester/makefiles/base.mk
+include makester/makefiles/makester.mk
 include makester/makefiles/docker.mk
 include makester/makefiles/python-venv.mk
 
@@ -18,21 +18,9 @@ MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
 
 init: makester-requirements
 
-bi: build-image
-
-build-image:
-	@$(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
-
-rmi: rm-image
-
-rm-image:
-	@$(DOCKER) rmi $(MAKESTER__SERVICE_NAME):$(HASH) || true
-
 login:
-	@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash || true
+	-@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash
 
 help: base-help docker-help python-venv-help
 	@echo "(Makefile)\n\
-  build-image:         Build docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias bi)\n\
-  rm-image:            Delete docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias rmi)\n\
   login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"
