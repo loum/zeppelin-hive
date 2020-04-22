@@ -5,6 +5,7 @@ MAKESTER__CONTAINER_NAME := zeppelin-hive
 include makester/makefiles/makester.mk
 include makester/makefiles/docker.mk
 include makester/makefiles/python-venv.mk
+include makester/makefiles/k8s.mk
 
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  --name $(MAKESTER__CONTAINER_NAME)\
@@ -21,6 +22,6 @@ init: makester-requirements
 login:
 	-@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash
 
-help: base-help docker-help python-venv-help
+help: base-help docker-help python-venv-help k8s-help
 	@echo "(Makefile)\n\
   login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"

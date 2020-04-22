@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+    zeppelin-hive:
+        image: ${SERVICE_NAME}:${HASH}
+        build:
+            context: .
+        container_name: zeppelin-hive
+        environment:
+            - ZEPPELIN_ADDR=0.0.0.0
+            - ZEPPELIN_PORT=18888
+            - ZEPPELIN_INTERPRETER_DEP_MVNREPO=https://repo1.maven.org/maven2/
+        ports:
+            - 18888:18888
+        labels:
+            kompose.service.type: LoadBalancer
