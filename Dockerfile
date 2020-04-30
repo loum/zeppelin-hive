@@ -33,7 +33,7 @@ COPY files/interpreters/jdbc/hive/interpreter-*.json.j2 /tmp/zeppelin-${ZEPPELIN
 FROM ubuntu:bionic-20200311
 
 RUN apt-get update && apt-get install -y --no-install-recommends\
- openjdk-8-jdk-headless=8u242-b08-0ubuntu3~18.04\
+ openjdk-8-jdk-headless=8u252-b09-1~18.04\
  python3.8=3.8.0-3~18.04\
  python3-pip=9.0.1-2.3~ubuntu1.18.04.1 &&\
  apt-get clean &&\

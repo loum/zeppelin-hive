@@ -51,15 +51,25 @@ When you are ready to build the image::
 
     $ make bi
 
+******************************************
+Interact with Zeppelin as Docker Container
+******************************************
+
+To start::
+
+    $ make run
+
+Browse to `<http://localhost:[ZEPPELIN_PORT]>`_ (``ZEPPELIN_PORT`` defaults to ``18888``)
+
+To stop::
+
+    $ make stop
+
 *********
 Image Tag
 *********
 
-To tag the image as ``latest``::
-
-    $ make tag
-
-Or to apply tagging convention using ``<zeppelin-version>-<hive-version>-<image-release-number>``::
+To apply tagging convention using ``<zeppelin-version>-<hive-version>-<image-release-number>``::
 
     $ make tag MAKESTER__IMAGE_TAG=0.9.0.preview1-3.1.2-1
 
