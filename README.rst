@@ -29,7 +29,7 @@ For first-time setup, get the `Makester project <https://github.com/loum/makeste
 
 Keep `Makester project <https://github.com/loum/makester.git>`_ up-to-date with::
 
-    $ git submodule update --remote --merge
+    $ make submodule-update
 
 Setup the environment::
 
@@ -49,7 +49,7 @@ Image Build
 
 When you are ready to build the image::
 
-    $ make bi
+    $ make build-image
 
 ******************************************
 Interact with Zeppelin as Docker Container
@@ -69,9 +69,26 @@ To stop::
 Image Tag
 *********
 
+.. note::
+
+    Search for existing tags with command::
+
+       $ make search-image
+
 To apply tagging convention using ``<zeppelin-version>-<hive-version>-<image-release-number>``::
 
-    $ make tag MAKESTER__IMAGE_TAG=0.9.0.preview1-3.1.2-1
+    $ make tag-version
+
+.. note::
+
+    Update versioning information in ``Makefile`` as follows:
+
+       - ```<zeppelin-version>-<hive-version>`` - ``MAKESTER__VERSION``
+       - ``<image-release-number>`` can be set via ``MAKESTER__RELEASE_NUMBER``
+
+To tag the image as ``latest``::
+
+    $ make tag-latest
 
 **********************
 Kubernetes Integration

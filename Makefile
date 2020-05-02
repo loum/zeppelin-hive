@@ -1,14 +1,16 @@
+MAKESTER__REPO_NAME = loum
+
+# Tagging convention used: <hadoop-version>-<hive-version>-<image-release-number>
+MAKESTER__VERSION = 0.9.0.preview1-3.1.2
+MAKESTER__RELEASE_NUMBER = 1
+
 include makester/makefiles/makester.mk
 include makester/makefiles/docker.mk
 include makester/makefiles/python-venv.mk
 include makester/makefiles/k8s.mk
 
-# Include overrides (must occur before include statements).
-MAKESTER__REPO_NAME = loum
-MAKESTER__CONTAINER_NAME = zeppelin-hive
-
 ZEPPELIN_PORT = 18888
-
+MAKESTER__CONTAINER_NAME = zeppelin-hive
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  --name $(MAKESTER__CONTAINER_NAME)\
  --env ZEPPELIN_ADDR=0.0.0.0\
@@ -20,6 +22,12 @@ MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  $(MAKESTER__SERVICE_NAME):$(HASH)
 
 init: makester-requirements
+
+backoff:
+	@$(PYTHON) makester/scripts/backoff -d "Web UI for Zeppelin" -p $(ZEPPELIN_PORT) localhost
+
+controlled-run: run backoff
+	@$(shell which xdg-open) http://localhost:$(ZEPPELIN_PORT)
 
 login:
 	-@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash
