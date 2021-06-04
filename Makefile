@@ -1,16 +1,31 @@
-MAKESTER__REPO_NAME = loum
+.DEFAULT_GOAL := help
+
+MAKESTER__REPO_NAME := loum
 
 # Tagging convention used: <hadoop-version>-<hive-version>-<image-release-number>
-MAKESTER__VERSION = 0.9.0.preview1-3.1.2
-MAKESTER__RELEASE_NUMBER = 1
+MAKESTER__VERSION := 0.9.0.preview1-3.1.2
+MAKESTER__RELEASE_NUMBER := 1
 
 include makester/makefiles/makester.mk
 include makester/makefiles/docker.mk
 include makester/makefiles/python-venv.mk
 include makester/makefiles/k8s.mk
 
-ZEPPELIN_PORT = 18888
-MAKESTER__CONTAINER_NAME = zeppelin-hive
+UBUNTU_BASE_IMAGE := focal-20210416
+OPENJDK_8_HEADLESS := 8u292-b10-0ubuntu1~20.04
+PYTHON_38 := 3.8.5-1~20.04.3
+PYTHON_38_PIP := 20.0.2-5ubuntu1.5
+
+MAKESTER__BUILD_COMMAND = $(DOCKER) build --rm\
+ --no-cache\
+ --build-arg UBUNTU_BASE_IMAGE=$(UBUNTU_BASE_IMAGE)\
+ --build-arg OPENJDK_8_HEADLESS=$(OPENJDK_8_HEADLESS)\
+ --build-arg PYTHON_38=$(PYTHON_38)\
+ --build-arg PYTHON_38_PIP=$(PYTHON_38_PIP)\
+ -t $(MAKESTER__IMAGE_TAG_ALIAS) .
+
+ZEPPELIN_PORT := 18888
+MAKESTER__CONTAINER_NAME := zeppelin-hive
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  --name $(MAKESTER__CONTAINER_NAME)\
  --env ZEPPELIN_ADDR=0.0.0.0\
@@ -21,7 +36,7 @@ MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  --name $(MAKESTER__CONTAINER_NAME)\
  $(MAKESTER__SERVICE_NAME):$(HASH)
 
-init: makester-requirements
+init: clear-env makester-requirements
 
 backoff:
 	@$(PYTHON) makester/scripts/backoff -d "Web UI for Zeppelin" -p $(ZEPPELIN_PORT) localhost
@@ -32,6 +47,9 @@ controlled-run: run backoff
 login:
 	-@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash
 
-help: base-help docker-help python-venv-help k8s-help
+help: makester-help docker-help python-venv-help k8s-help
 	@echo "(Makefile)\n\
   login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"
+  login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"
+
+.PHONY: help

@@ -1,7 +1,8 @@
 ARG ZEPPELIN_VERSION=0.9.0-preview1
 ARG ZEPPELIN_HIVE_INTERPRETER_JDBC=/tmp/interpreter/jdbc/hive
+ARG UBUNTU_BASE_IMAGE
 
-FROM ubuntu:bionic-20200311 AS downloader
+FROM ubuntu:${UBUNTU_BASE_IMAGE} AS downloader
 
 RUN apt-get update && apt-get install -y --no-install-recommends\
  wget\
@@ -14,15 +15,15 @@ RUN wget -qO- "https://apache.mirror.digitalpacific.com.au/zeppelin/zeppelin-${Z
 
 # Add JAR dependencies for Hive.
 ARG ZEPPELIN_HIVE_INTERPRETER_JDBC
-RUN mkdir -pv "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/curator/curator-client/4.2.0/curator-client-4.2.0.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar  &&\
- wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/com/google/guava/guava/10.0.1/guava-10.0.1.jar
+RUN mkdir -pv "${ZEPPELIN_HIVE_INTERPRETER_JDBC}"\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/curator/curator-client/4.2.0/curator-client-4.2.0.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar\
+ && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/com/google/guava/guava/10.0.1/guava-10.0.1.jar
 
 RUN ls -altr "${ZEPPELIN_HIVE_INTERPRETER_JDBC}"
 
@@ -30,21 +31,25 @@ COPY files/interpreters/jdbc/hive/interpreter-*.json.j2 /tmp/zeppelin-${ZEPPELIN
 
 ### downloader layer end
 
-FROM ubuntu:bionic-20200311
+ARG UBUNTU_BASE_IMAGE
+FROM ubuntu:${UBUNTU_BASE_IMAGE}
 
+ARG OPENJDK_8_HEADLESS
+ARG PYTHON_38
+ARG PYTHON_38_PIP
 RUN apt-get update && apt-get install -y --no-install-recommends\
- openjdk-8-jdk-headless=8u252-b09-1~18.04\
- python3.8=3.8.0-3~18.04\
- python3-pip=9.0.1-2.3~ubuntu1.18.04.1 &&\
- apt-get clean &&\
- rm -rf /var/lib/apt/lists/* &&\
- update-alternatives --install /usr/bin/python python3 /usr/bin/python3.8 1
+ openjdk-8-jdk-headless=${OPENJDK_8_HEADLESS}\
+ python3.8=${PYTHON_38}\
+ python3-pip=${PYTHON_38_PIP}\
+ && rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/python python3 /usr/bin/python3.8 1
 
 # Run everything as ZEPPELIN_USER
 ARG ZEPPELIN_USER=zeppelin
 ARG ZEPPELIN_GROUP=zeppelin
-RUN addgroup ${ZEPPELIN_GROUP} &&\
- adduser --ingroup "${ZEPPELIN_GROUP}" --shell /bin/bash --disabled-password --disabled-login --gecos "" "${ZEPPELIN_USER}"
+RUN addgroup ${ZEPPELIN_GROUP}\
+&& adduser --ingroup "${ZEPPELIN_GROUP}" --shell /bin/bash --disabled-password --disabled-login --gecos "" "${ZEPPELIN_USER}"
 
 COPY scripts/zeppelin-bootstrap.sh /zeppelin-bootstrap.sh
 
