@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
  openjdk-8-jdk-headless=${OPENJDK_8_HEADLESS}\
  python3.8=${PYTHON_38}\
  python3-pip=${PYTHON_38_PIP}\
+ make\
  && rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/python python3 /usr/bin/python3.8 1
