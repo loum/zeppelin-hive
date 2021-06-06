@@ -2,8 +2,10 @@
 
 MAKESTER__REPO_NAME := loum
 
+ZEPPELIN_VERSION := 0.9.0
+
 # Tagging convention used: <hadoop-version>-<hive-version>-<image-release-number>
-MAKESTER__VERSION := 0.9.0.preview1-3.1.2
+MAKESTER__VERSION := $(ZEPPELIN_VERSION)-3.1.2
 MAKESTER__RELEASE_NUMBER := 1
 
 include makester/makefiles/makester.mk
@@ -24,13 +26,17 @@ MAKESTER__BUILD_COMMAND = $(DOCKER) build --rm\
  --build-arg PYTHON_38_PIP=$(PYTHON_38_PIP)\
  -t $(MAKESTER__IMAGE_TAG_ALIAS) .
 
-ZEPPELIN_PORT := 18888
+ZEPPELIN_ADDR ?= 0.0.0.0
+ZEPPELIN_PORT ?= 18888
+ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL ?= jdbc:hive2://localhost:10000
+ZEPPELIN_INTERPRETER_DEP_MVNREPO ?= https://repo1.maven.org/maven2/
 MAKESTER__CONTAINER_NAME := zeppelin-hive
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
  --name $(MAKESTER__CONTAINER_NAME)\
- --env ZEPPELIN_ADDR=0.0.0.0\
+ --env ZEPPELIN_ADDR=$(ZEPPELIN_ADDR)\
  --env ZEPPELIN_PORT=$(ZEPPELIN_PORT)\
- --env ZEPPELIN_INTERPRETER_DEP_MVNREPO=https://repo1.maven.org/maven2/\
+ --env ZEPPELIN_INTERPRETER_DEP_MVNREPO=$(ZEPPELIN_INTERPRETER_DEP_MVNREPO)\
+ --env ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL=$(ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL)\
  --publish $(ZEPPELIN_PORT):$(ZEPPELIN_PORT)\
  --hostname $(MAKESTER__CONTAINER_NAME)\
  --name $(MAKESTER__CONTAINER_NAME)\
@@ -49,7 +55,7 @@ login:
 
 help: makester-help docker-help python-venv-help k8s-help
 	@echo "(Makefile)\n\
-  login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"
+  init                 Build the local Python-based virtual environment\n\
   login:               Login to container $(MAKESTER__CONTAINER_NAME) as user \"hdfs\"\n"
 
-.PHONY: help
+.PHONY: help login

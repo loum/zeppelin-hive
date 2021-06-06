@@ -1,4 +1,4 @@
-ARG ZEPPELIN_VERSION=0.9.0-preview1
+ARG ZEPPELIN_VERSION=0.9.0
 ARG ZEPPELIN_HIVE_INTERPRETER_JDBC=/tmp/interpreter/jdbc/hive
 ARG UBUNTU_BASE_IMAGE
 
@@ -15,17 +15,16 @@ RUN wget -qO- "https://apache.mirror.digitalpacific.com.au/zeppelin/zeppelin-${Z
 
 # Add JAR dependencies for Hive.
 ARG ZEPPELIN_HIVE_INTERPRETER_JDBC
-RUN mkdir -pv "${ZEPPELIN_HIVE_INTERPRETER_JDBC}"\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/curator/curator-client/4.2.0/curator-client-4.2.0.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar\
- && wget -P "${ZEPPELIN_HIVE_INTERPRETER_JDBC}" https://repo1.maven.org/maven2/com/google/guava/guava/10.0.1/guava-10.0.1.jar
-
-RUN ls -altr "${ZEPPELIN_HIVE_INTERPRETER_JDBC}"
+ARG MAVEN_REPO=https://repo1.maven.org/maven2
+RUN mkdir -pv $ZEPPELIN_HIVE_INTERPRETER_JDBC\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-exec/3.1.2/hive-exec-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/curator/curator-client/5.1.0/curator-client-5.1.0.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar
 
 COPY files/interpreters/jdbc/hive/interpreter-*.json.j2 /tmp/zeppelin-${ZEPPELIN_VERSION}-bin-netinst/conf/
 
