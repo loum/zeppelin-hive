@@ -17,29 +17,29 @@ RUN wget -qO- "https://apache.mirror.digitalpacific.com.au/zeppelin/zeppelin-${Z
 ARG ZEPPELIN_HIVE_INTERPRETER_JDBC
 ARG MAVEN_REPO=https://repo1.maven.org/maven2
 RUN mkdir -pv $ZEPPELIN_HIVE_INTERPRETER_JDBC\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-exec/3.1.2/hive-exec-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/curator/curator-client/5.1.0/curator-client-5.1.0.jar\
- && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC ${MAVEN_REPO}/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-exec/3.1.2/hive-exec-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-service/3.1.2/hive-service-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-service-rpc/3.1.2/hive-service-rpc-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-common/3.1.2/hive-common-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hive/hive-serde/3.1.2/hive-serde-3.1.2.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/curator/curator-client/5.1.0/curator-client-5.1.0.jar\
+ && wget -P $ZEPPELIN_HIVE_INTERPRETER_JDBC $MAVEN_REPO/org/apache/hadoop/hadoop-common/3.2.1/hadoop-common-3.2.1.jar
 
 COPY files/interpreters/jdbc/hive/interpreter-*.json.j2 /tmp/zeppelin-${ZEPPELIN_VERSION}-bin-netinst/conf/
 
 ### downloader layer end
 
 ARG UBUNTU_BASE_IMAGE
-FROM ubuntu:${UBUNTU_BASE_IMAGE}
+FROM ubuntu:$UBUNTU_BASE_IMAGE
 
 ARG OPENJDK_8_HEADLESS
 ARG PYTHON_38
 ARG PYTHON_38_PIP
 RUN apt-get update && apt-get install -y --no-install-recommends\
- openjdk-8-jdk-headless=${OPENJDK_8_HEADLESS}\
- python3.8=${PYTHON_38}\
- python3-pip=${PYTHON_38_PIP}\
+ openjdk-8-jdk-headless=$OPENJDK_8_HEADLESS\
+ python3.8=$PYTHON_38\
+ python3-pip=$PYTHON_38_PIP\
  make\
  && rm -rf /var/lib/apt/lists/*
 
@@ -48,13 +48,17 @@ RUN update-alternatives --install /usr/bin/python python3 /usr/bin/python3.8 1
 # Run everything as ZEPPELIN_USER
 ARG ZEPPELIN_USER=zeppelin
 ARG ZEPPELIN_GROUP=zeppelin
-RUN addgroup ${ZEPPELIN_GROUP}\
-&& adduser --ingroup "${ZEPPELIN_GROUP}" --shell /bin/bash --disabled-password --disabled-login --gecos "" "${ZEPPELIN_USER}"
+RUN addgroup $ZEPPELIN_GROUP &&\
+ useradd -m\
+ --gid $ZEPPELIN_GROUP\
+ --shell /bin/bash\
+ $ZEPPELIN_USER
+
 
 COPY scripts/zeppelin-bootstrap.sh /zeppelin-bootstrap.sh
 
-USER "${ZEPPELIN_USER}"
-WORKDIR "/home/${ZEPPELIN_USER}"
+USER $ZEPPELIN_USER
+WORKDIR /home/$ZEPPELIN_USER
 
 ARG ZEPPELIN_VERSION
 COPY --from=downloader --chown="${ZEPPELIN_USER}":"${ZEPPELIN_GROUP}"\
@@ -78,4 +82,4 @@ COPY --chown="${ZEPPELIN_USER}":"${ZEPPELIN_GROUP}" scripts/interpreter-*.py zep
 RUN python -V
 RUN python -m pip install --user jinja2
 
-CMD [ "/zeppelin-bootstrap.sh" ]
+ENTRYPOINT [ "/zeppelin-bootstrap.sh" ]
