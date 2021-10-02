@@ -1,4 +1,4 @@
-# Apache Zeppelin (Hive Interpreter) v0.9.0
+# Apache Zeppelin (Hive Interpreter)
 - [Overview](#Overview)
 - [Quick Links](#Quick-Links)
 - [Quick Start](#Quick-Start)
@@ -12,7 +12,7 @@
 - [Interact with Zeppelin as Docker Container](#Interact-with-Zeppelin-as-Docker-Container)
 
 ## Overview
-[Zeppelin](https://zeppelin.apache.org/docs/0.9.0/) on Docker with minimal capability and Hive Interpreter capability.
+[Zeppelin](https://zeppelin.apache.org/docs/0.10.0/) on Docker with minimal capability and Hive Interpreter capability.
 
 > **_NOTE:_** Our custom `hive` interpreter overrides the `zeppelin.jdbc.hive.timeout.threshold` from 1 minute to 20 minutes.  Not sure if it's related to https://issues.apache.org/jira/browse/ZEPPELIN-5146?  Either way, this will hard-limit your query to twenty (20) minutes (as opposed to the default one (1) minute) regardless of the state of your query.  If triggerred, the resultant _"Cancel this job as no more log is produced in the last ?? seconds, maybe it is because no yarn resources"_ is an assumption that is just wrong.  Worse, it manifests in your Spark logs as an obscure `java.lang.NullPointerException: null` error.  I hope this is fixed or its intension made much, much clearer.
 
@@ -84,7 +84,7 @@ make controlled-run
 ```
 Browse to http://localhost:[ZEPPELIN_PORT] (`ZEPPELIN_PORT` defaults to `18888`).
 
-In addition to the rich set of environment variables provided by [Apache Zeppelin configuration](https://zeppelin.apache.org/docs/0.9.0/setup/operation/configuration.html) you can also set the Hive interpreter's `default.url` via the custom `ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL`.  For example, if your Hive server is running on the host named `hive` in port `10000` then set the `ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL` environment variable with this JDBC URL:
+In addition to the rich set of environment variables provided by [Apache Zeppelin configuration](https://zeppelin.apache.org/docs/0.10.0/setup/operation/configuration.html) you can also set the Hive interpreter's `default.url` via the custom `ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL`.  For example, if your Hive server is running on the host named `hive` in port `10000` then set the `ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL` environment variable with this JDBC URL:
 ```
   ZEPPELIN_INTERPRETER_HIVE_DEFAULT_URL=jdbc:hive2://hive:10000
 ```
@@ -100,5 +100,6 @@ To stop:
 ```
 make stop
 ```
+
 ---
-[top](#Apache-Zeppelin-(Hive-Interpreter)-v0.9.0)
+[top](#Apache-Zeppelin-(Hive-Interpreter))
