@@ -2,12 +2,12 @@
 
 MAKESTER__REPO_NAME := loum
 
-ZEPPELIN_VERSION := 0.9.0
+ZEPPELIN_VERSION := 0.10.0
 HIVE_VERSION := 3.1.2
 
 # Tagging convention used: <hadoop-version>-<hive-version>-<image-release-number>
 MAKESTER__VERSION := $(ZEPPELIN_VERSION)-$(HIVE_VERSION)
-MAKESTER__RELEASE_NUMBER := 3
+MAKESTER__RELEASE_NUMBER := 1
 
 MAKESTER__CONTAINER_NAME := zeppelin-hive
 
